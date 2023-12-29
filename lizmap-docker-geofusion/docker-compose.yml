@@ -2,12 +2,12 @@ version: '3'
 services:
   apache-php:
     build:
-      context: .  # Usa il Dockerfile corrente
+      context: .
       dockerfile: Dockerfile-geofusion
     volumes:
       - apache-php-data:/var/www/html
     ports:
-      - "70:80"  # Cambia la porta dell'host a 70
+      - "70:80"
     networks:
       - lizmap-net
     depends_on:
@@ -15,7 +15,7 @@ services:
 
   qgis-server:
     build:
-      context: .  # Usa il Dockerfile corrente
+      context: .
       dockerfile: Dockerfile-geofusion
     volumes:
       - qgis-server-data:/var/www/qgis-server
@@ -25,11 +25,13 @@ services:
       - lizmap-net
 
   lizmap:
-    image: lizmap/lizmap-web-client
+    build:
+      context: .
+      dockerfile: Dockerfile-lizmap # Specifica il tuo Dockerfile per lizmap
     volumes:
       - lizmap-data:/var/www/lizmap
     ports:
-      - "81:80"  # Porta di Lizmap nell'host
+      - "81:80"
     networks:
       - lizmap-net
 
