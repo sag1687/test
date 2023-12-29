@@ -1,44 +1,15 @@
 version: '3'
+
 services:
-  apache-php:
+  geofusion:
     build:
       context: .
-      dockerfile: Dockerfile-geofusion
-    volumes:
-      - apache-php-data:/var/www/html
+      dockerfile: Dockerfile-Geofusion
     ports:
-      - "70:80"
-    networks:
-      - lizmap-net
-    depends_on:
-      - qgis-server
-
-  qgis-server:
-    build:
-      context: .
-      dockerfile: Dockerfile-geofusion
+      - "80:80"
     volumes:
-      - qgis-server-data:/var/www/qgis-server
-    ports:
-      - "8080:80"
-    networks:
-      - lizmap-net
-
-  lizmap:
-    build:
-      context: .
-      dockerfile: Dockerfile-lizmap # Specifica il tuo Dockerfile per lizmap
-    volumes:
-      - lizmap-data:/var/www/lizmap
-    ports:
-      - "81:80"
-    networks:
-      - lizmap-net
-
-networks:
-  lizmap-net:
-
-volumes:
-  apache-php-data:
-  qgis-server-data:
-  lizmap-data:
+      - ./apache2.conf:/etc/apache2/sites-available/000-default.conf
+      - ./fcgid.conf:/etc/apache2/mods-available/fcgid.conf
+    environment:
+      LIZMAP_VERSION: 3.6.4
+    restart: always
