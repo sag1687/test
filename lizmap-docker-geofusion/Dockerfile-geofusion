@@ -1,14 +1,13 @@
-# Scegli un'immagine di base (potresti voler sostituire questa con un'immagine di PHP 8.1 se preferisci)
+# Scegli un'immagine di base (puoi sostituire questa con un'immagine di PHP 8.1 se preferisci)
 FROM ubuntu:latest
 
 # Imposta la modalità non interattiva per apt-get
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Aggiorna il sistema e installa le dipendenze di base
-RUN apt-get update && apt-get upgrade -y && apt-get install -y apache2 xvfb libapache2-mod-php php-gd php-mysql php-curl php-mbstring libsqlite3-0 libsqlite3-dev php-sqlite3 php-xml curl php-intl php-gmp php-bcmath php-imagick php-zip python-software-properties && \
-    add-apt-repository ppa:ubuntugis/ubuntugis-unstable && \
-    apt-get install -y unzip wget qgis-server* libapache2-mod-fcgid && \
-    a2enmod fcgid && a2enconf serve-cgi-bin && \
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
+    apache2 xvfb libapache2-mod-php php-gd php-mysql php-curl php-mbstring libsqlite3-0 libsqlite3-dev php-sqlite3 php-xml curl php-intl php-gmp php-bcmath php-imagick php-zip && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copia il file di configurazione di Apache2 sostitutivo
@@ -17,7 +16,16 @@ COPY ./apache2.conf /etc/apache2/sites-available/000-default.conf
 # Copia il file di configurazione di fcgid
 COPY ./fcgid.conf /etc/apache2/mods-available/fcgid.conf
 
-# Esegui i comandi per installare Lizmap
+# Aggiungi il repository PPA di ubuntugis-unstable e installa QGIS Server
+RUN apt-get update && \
+    apt-get install -y software-properties-common && \
+    add-apt-repository ppa:ubuntugis/ubuntugis-unstable && \
+    apt-get update && \
+    apt-get install -y unzip wget qgis-server* libapache2-mod-fcgid && \
+    a2enmod fcgid && a2enconf serve-cgi-bin && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Crea la directory per Lizmap e installa Lizmap
 ARG LIZMAP_VERSION=3.6.4
 RUN mkdir -p /var/www/lizmap && \
     cd /var/www/lizmap && \
